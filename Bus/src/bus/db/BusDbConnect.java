@@ -21,9 +21,9 @@ public class BusDbConnect
 	
 	public static Connection getConnect()//버스DB에 연결할 생성자 입니다.  
 	{
-		String id = "siri";//오라클 접속 id
-		String pw = "123456";//오라클 접속 비밀번호
-		String url  = "jdbc:oracle:thin:@180.228.49.152:1521/pdborcl"; // 192.168.0.172
+		String id = "sixtank";//오라클 접속 id
+		String pw = "sixtank";//오라클 접속 비밀번호
+		String url  = "jdbc:oracle:thin:@112.216.253.122:1521:xe"; // 192.168.0.172
 		
 		try 
 		{

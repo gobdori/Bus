@@ -43,6 +43,7 @@ public class RsvPnl extends JPanel {
 	public Vector<BusColumn> vCBus;
 	Vector<String> loc;
 	Vector<String> seats=new Vector<String>() ;
+	JTabbedPane timeTabb;
 	public BusTimesTableModel busoModel = new BusTimesTableModel(); 
 	public BusTimesTableModel buspModel = new BusTimesTableModel();
 	
@@ -182,8 +183,8 @@ public class RsvPnl extends JPanel {
 		timeBox.setMinimumSize(new Dimension(600,190));
 		
 		// 탭을 생성하고 만들어진 탭은 위로 노출되도록 설정 
-		JTabbedPane t = new JTabbedPane();				
-		t.setTabPlacement(JTabbedPane.TOP);		
+		timeTabb = new JTabbedPane();				
+		timeTabb.setTabPlacement(JTabbedPane.TOP);		
 		
 		// 만들어진 각 탭안에 패널을 생성
 		JPanel p1 = new JPanel();	// '일반'탭 안의 패널
@@ -252,16 +253,18 @@ public class RsvPnl extends JPanel {
 	  p2.add(new JScrollPane(jtpScroll));
                   
     // 탭 이름을 추가함
-    t.addTab("일반", p1);
-    t.addTab("우등", p2);
-    t.addChangeListener( new ChangeListener() {
+	  timeTabb.addTab("일반", p1);
+	  timeTabb.addTab("우등", p2);
+	  timeTabb.addChangeListener( new ChangeListener() {
         public void stateChanged(ChangeEvent e) {
-        	
+        	//seats.removeAllElements();
+        	jto.clearSelection();
+        	jtp.clearSelection();
         }
     });
         
     // 만들어진 버스시간표 탭을 박스 안에 넣어줌
-    timeBox.add(t);
+    timeBox.add(timeTabb);
 
 		
 	// 인원수 (peBox : BoxLayout)
@@ -371,10 +374,21 @@ public class RsvPnl extends JPanel {
 			else if (btn == btnRsvn) 
 			{				
 				// RsvnfoPnl로 데이터가 넘어가야 함
-				BusColumn buscol = busoModel.getRowData(jto.getSelectedRow());
+				if(  timeTabb.getSelectedIndex()==0)
+				{
+					BusColumn buscol = busoModel.getRowData(jto.getSelectedRow());
+					String busid = buscol.getBUSTIMEID();
+					seats.toString();
+				}									
+				else if(  timeTabb.getSelectedIndex()==1)
+				{
+					
+				}
+					
+				//JOptionPane.showMessageDialog(null,"시간을 선택해주세요.");
+								
 				
-				JOptionPane.showMessageDialog(null,buscol.getBUSTIMEID());
-				JOptionPane.showMessageDialog(null,seats.toString());			
+							
 				
 				
 			}			
