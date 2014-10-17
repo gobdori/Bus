@@ -1,20 +1,65 @@
 /*진행사항테이블 */
 package bus.db;
 
-public class Progress {
+public class RsvColumn {
 private String RSVID;
 private String USERID;
 private String BUSTIMEID;
 private String RSVSEAT;
 private String PAYMENTID;
-private String ISRID;
+private String RSVSTATEID;
+private String BUSSTTIME;
+private String DESTMNID;
+private String ARRTMNID;
+private String DESNAME;
+private String ARRNAME;
 private String RSVTRIP;
 private String RSVDATE;
-private String CANCELDATE;
 private Number PAYMONEY;
 private String USERGRADE;
 private String HANDYCAP;
-public String getRSVID() {
+
+
+
+
+public String getRSVSTATEID() {
+	return RSVSTATEID;
+}
+public void setRSVSTATEID(String rSVSTATEID) {
+	RSVSTATEID = rSVSTATEID;
+}
+public String getBUSSTTIME() {
+	return BUSSTTIME;
+}
+public void setBUSSTTIME(String bUSSTTIME) {
+	BUSSTTIME = bUSSTTIME;
+}
+public String getDESTMNID() {
+	return DESTMNID;
+}
+public void setDESTMNID(String dESTMNID) {
+	DESTMNID = dESTMNID;
+}
+public String getARRTMNID() {
+	return ARRTMNID;
+}
+public void setARRTMNID(String aRRTMNID) {
+	ARRTMNID = aRRTMNID;
+}
+public String getDESNAME() {
+	return DESNAME;
+}
+public void setDESNAME(String dESNAME) {
+	DESNAME = dESNAME;
+}
+public String getARRNAME() {
+	return ARRNAME;
+}
+public void setARRNAME(String aRRNAME) {
+	ARRNAME = aRRNAME;
+}
+public String getRSVID() 
+{
 	return RSVID;
 }
 public void setRSVID(String rSVID) {
@@ -44,12 +89,6 @@ public String getPAYMENTID() {
 public void setPAYMENTID(String pAYMENTID) {
 	PAYMENTID = pAYMENTID;
 }
-public String getISRID() {
-	return ISRID;
-}
-public void setISRID(String iSRID) {
-	ISRID = iSRID;
-}
 public String getRSVTRIP() {
 	return RSVTRIP;
 }
@@ -61,12 +100,6 @@ public String getRSVDATE() {
 }
 public void setRSVDATE(String rSVDATE) {
 	RSVDATE = rSVDATE;
-}
-public String getCANCELDATE() {
-	return CANCELDATE;
-}
-public void setCANCELDATE(String cANCELDATE) {
-	CANCELDATE = cANCELDATE;
 }
 public Number getPAYMONEY() {
 	return PAYMONEY;

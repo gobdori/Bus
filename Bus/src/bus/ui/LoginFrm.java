@@ -27,10 +27,10 @@ public class LoginFrm extends JFrame
 	}	
 	
 	//ID를 적는 텍스트박스(초기값 ID를 가짐. 15는 텍스트박스크기)
-	JTextField txtId = new JTextField("AAAA", 15);	
+	JTextField txtId = new JTextField("BBBB", 15);	
 	
 	//패스워드를 적는 텍스트 박스(초기값 P/W를 가짐. 15는 텍스트박스크기) 
-	JPasswordField txtPassword = new JPasswordField("AAAA",15);
+	JPasswordField txtPassword = new JPasswordField("BBBB",15);
 	
 	//로그인 버튼
 	JButton btnLogin = new JButton("LOGIN");
@@ -112,7 +112,6 @@ public class LoginFrm extends JFrame
 					JOptionPane.showMessageDialog(null, "비밀번호가 입력되지 않았습니다. ");
 					return;
 				}
-							
 				
 				DbQuery select = new DbQuery();
 				select.DbLogin(uId, uPass);				

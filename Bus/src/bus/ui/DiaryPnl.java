@@ -1,6 +1,5 @@
 package bus.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -15,6 +14,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
+import javax.swing.border.EtchedBorder;
+
+import bus.db.DbQuery;
 
 public class DiaryPnl extends JPanel{
 	
@@ -28,8 +31,12 @@ public class DiaryPnl extends JPanel{
 	JPanel pDate = new JPanel();
 	JPanel pWeek = new JPanel();
 	JPanel pUp = new JPanel();
+	JPanel pUp2 = new JPanel();
+	JPanel pUp3 = new JPanel();
+	JPanel pUp4 = new JPanel();
+	JPanel pUp5 = new JPanel();	
 	JLabel lblYearMon = new JLabel();
-	
+	String[] Week = {"일","월","화","수","목","금","토"};
 	Box box = Box.createVerticalBox();
 	
 	JButton btnPrevMon = new JButton("◀");
@@ -40,51 +47,41 @@ public class DiaryPnl extends JPanel{
 	JButton[] btnWeek = new JButton[7];
 	
 	Calendar curMon = Calendar.getInstance();
-	
-	//public DiaryPnl (RsvnStep01 mainFrame, boolean modal) 
-	public DiaryPnl (){
+ 
+	public DiaryPnl(){
 		
 		box.setPreferredSize(new Dimension(580,380));
 		
 		this.mainFrame = mainFrame;
 		
-		pUp.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		pUp.setBackground(Color.red);
-		
+		pUp.setLayout(new FlowLayout(FlowLayout.RIGHT));		
+		pUp2.setLayout(new FlowLayout(FlowLayout.RIGHT));
+
 		
 		pUp.add(btnPrevMon);
 		pUp.add(lblYearMon);
 		pUp.add(btnNextMon);
-		pUp.add(btnDiarySave);
-		//저장 버튼
-		//pUp.add(btnDiarySave);
 		
+		pUp2.add(btnDiarySave);
 		
-		box.add(pUp);
+		pUp5.setPreferredSize(new Dimension(180,10));
+		pUp4.setPreferredSize(new Dimension(120,10));
+		pUp3.add(pUp5);
+		pUp3.add(pUp);
+		pUp3.add(pUp4);
+		pUp3.add(pUp2);
+		
+		box.add(pUp3);
 		box.add(Box.createVerticalGlue());
-		
+		box.add(Box.createHorizontalGlue());
 		
 		pWeek.setLayout(new GridLayout(1, 7));
-		btnWeek[0] = new JButton("일");
-		btnWeek[1] = new JButton("월");
-		btnWeek[2] = new JButton("화");
-		btnWeek[3] = new JButton("수");
-		btnWeek[4] = new JButton("목");
-		btnWeek[5] = new JButton("금");
-		btnWeek[6] = new JButton("토");
-		
-		pWeek.add(btnWeek[0]);
-		pWeek.add(btnWeek[1]);
-		pWeek.add(btnWeek[2]);
-		pWeek.add(btnWeek[3]);
-		pWeek.add(btnWeek[4]);
-		pWeek.add(btnWeek[5]);
-		pWeek.add(btnWeek[6]);
+		for (int i = 0; i < Week.length; i++) {
+			pWeek.add(lbladdWeek(Week[i], Color.LIGHT_GRAY));
+		}
 		box.add(pWeek);
 		box.add(Box.createVerticalGlue());
-		
-		
-		
+				
 		pDate.setLayout(new GridLayout(6, 7));
 		for (int i = 0; i < btnArr.length; i++) {
 			btnArr[i] = new JButton("");
@@ -96,35 +93,32 @@ public class DiaryPnl extends JPanel{
 		btnNextMon.addActionListener(new BtnEventHandler());
 		
 		btnDiarySave.addActionListener(new BtnEventHandler());
-		
-//		addWindowListener(new WindowAdapter() {
-//			public void windowClosing (WindowEvent we) {
-//				we.getWindow().setVisible(false);
-//				we.getWindow().dispose();
-//				//System.exit(0);
-//			}
-//		});
-		
-		//Diary.add(pUp, "North");
-		//Diary.add(pWeek, "Center");
-		//Diary.add(pDate, "South");		
-		//add(Diary);		
-
 		setDays(curMon);
-		//setDialogLocation();
-		//setVisible(true);
+		
 		
 		box.add(Box.createVerticalGlue());
 		JTextArea areaMemo = new JTextArea(7,20);
 		areaMemo.setBackground(new Color(255,255,255));			
-		JScrollPane scrollPane = new JScrollPane(
-				areaMemo,
+		JScrollPane scrollPane = new JScrollPane(areaMemo,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		box.add(scrollPane);
-		add(box);
+		add(box);	
 	}
+	
+	public JLabel lbladdWeek(String text, Color color) {
+		  JLabel label = new JLabel();
+		  label.setText(text);
+		  label.setHorizontalAlignment(SwingConstants.CENTER);
+		  label.setBorder(new EtchedBorder());
+		  if (color != null) {
+		   label.setOpaque(true);
+		   label.setBackground(color);
+		  }
+		  return label;
+		 }
+	
 	
 	@SuppressWarnings("deprecation")
 	void setDays(Calendar date) {

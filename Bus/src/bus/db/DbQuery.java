@@ -12,11 +12,18 @@ public class DbQuery
 {	
 	//로그인이 성공인지 아닌지 체크하는 값
 	private boolean log;  //로그인이 됐는지 아닌지 확인하는 값
-	private String username;  //로그인 성공시 가져올 회원이름
+	private static String username;  //로그인 성공시 가져올 회원이름
+	private static String userid;  //로그인 성공시 가져올 회원 ID
+	public static String getUserid() {
+		return userid;
+	}
+	public static void setUserid(String userid) {
+		DbQuery.userid = userid;
+	}
+
 	static Connection conn;	//연결객체
 	static PreparedStatement pstmt = null;//쿼리를 날리기 위한 어떤 것;;
-	static ResultSet result = null;//쿼리를 보낸 후 받아올 결과값을 저장할 어떤 것. 
-
+	static ResultSet result = null;//쿼리를 보낸 후 받아올 결과값을 저장할 어떤 것.
 	private static Vector<BusColumn> obustime;//일반버스 시간표 벡터값
 	private static Vector<BusColumn> pbustime;//우등버스 시간표 벡터값
 	
@@ -24,6 +31,13 @@ public class DbQuery
 ////////////////////////////////////////////////////////////////
 /////GETTER and SETTER////
 ////////////////////////////////////////////////////////////////
+	public static String getUsername() {
+		return username;
+	}
+	public static void setUsername(String username) {
+		DbQuery.username = username;
+	}
+
 	public static Vector<BusColumn> getObustime() {
 		return obustime;
 	}
@@ -147,6 +161,7 @@ public class DbQuery
 				//conn.result.getString("UNAME") 
 				//이건 검색된 행의 UNAME컬럼의 값을 의미한다. 여기선 사용자 이름!!
 				username = result.getString("UNAME");
+				userid = id;
 				JOptionPane.showMessageDialog(null,result.getString("UNAME")+"님이 로그인 하셨습니다.");
 				
 				//로그인이 성공적으로 되었으므로 체크값을 true로 바꾼다.  
@@ -287,8 +302,11 @@ public class DbQuery
 					"insert into RSVINFOTBL(rsvid, userid, bustimeid, rsvseat, rsvstateid, rsvdate)"
 					+ "values(SEQ_RSVINFO.NEXTVAL, ? , ?, ?,'beforepaid',SYSDATE)");
 			pstmt.setString(1, userid);
+			System.out.println(userid);
 			pstmt.setString(2, bustimeid);
+			System.out.println(bustimeid);
 			pstmt.setString(3, rsvseat);
+			System.out.println(rsvseat);
 			
 			int results = pstmt.executeUpdate();
 			if(results !=1)
@@ -301,6 +319,84 @@ public class DbQuery
 		
 	}
 	
+////////////////////////////////////////////////////////////////////////
+/////회원 가입시 DB에 회원 정보를 저장시키는 메소드(INSERT)/////////////
+/////실행을 시키기 위해선 유져ID,비밀번호, 유저등급, 나이, 이름////////////
+/////주소, 생일, 이메일, 폰 정보가 필요함. ////////////////////////////////
+///////////////////////////////////////////////////////////////////////	
+	public Vector<RsvColumn> getRsvList(String name) {
+
+		String qry = "select rsvid, userid, rsvseat, rsvstateid, paymentid, rsvtrip, "
+				+ "rsvdate, paymoney, usergrade, handycap, bustimeid, "
+				+ "bussttime, destmnid, arrtmnid, desname, arrname from view_rsv where userid = ?";
+
+		Vector<RsvColumn> rsvList = new Vector<RsvColumn>();
+
+		try {
+			/* DBManager 클래스를 이용해 Connection 객체를 얻는다. */
+			conn = BusDbConnect.getConnect();
+			pstmt = conn.prepareStatement(qry);
+			pstmt.setString(1, name);
+			result = pstmt.executeQuery();
+
+			while (result.next()) {
+				RsvColumn rsvCol = new RsvColumn();
+
+				rsvCol.setRSVID(result.getString("rsvid"));
+				rsvCol.setUSERID(result.getString("userid"));
+				rsvCol.setRSVSEAT(result.getString("rsvseat"));
+				rsvCol.setRSVSTATEID(result.getString("rsvstateid"));
+				rsvCol.setPAYMENTID(result.getString("paymentid"));				
+				rsvCol.setRSVDATE(result.getString("rsvdate"));
+				rsvCol.setPAYMONEY(result.getInt("paymoney"));				
+				rsvCol.setHANDYCAP(result.getString("handycap"));
+				rsvCol.setBUSTIMEID(result.getString("bustimeid"));
+				rsvCol.setBUSSTTIME(result.getString("bussttime"));
+				rsvCol.setDESTMNID(result.getString("destmnid"));
+				rsvCol.setARRTMNID(result.getString("arrtmnid"));
+				rsvCol.setDESNAME(result.getString("desname"));
+				rsvCol.setARRNAME(result.getString("arrname"));
+				
+				rsvList.add(rsvCol);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("ProgressManagerDao - getProgressList()");
+		} finally {
+			try
+			{
+				conn.close();
+			}
+			catch(SQLException e)
+			{
+				JOptionPane.showMessageDialog(null,e.getErrorCode());
+			}			
+		}
+		return rsvList;
+	}
+	
+	public Vector<String> selectSeat(String busid)
+	{
+		conn =BusDbConnect.getConnect();
+		Vector<String> seats= new Vector<String>();
+		try
+		{
+			pstmt = conn.prepareStatement("select RSVSEAT from RSVINFOTBL where bustimeid = ?");
+			pstmt.setString(1, busid);
+			result = pstmt.executeQuery();
+			
+			while(result.next())
+			{
+				seats.add(result.getString("RSVSEAT"));
+			}
+		}
+		catch(SQLException e)
+		{
+			JOptionPane.showMessageDialog(null,"selectSeat"+e.getErrorCode());
+		}		
+		return seats;
+	}
 ////////////////////////////////////////////////////////////////////////
 /////회원 가입시 DB에 회원 정보를 저장시키는 메소드(INSERT)/////////////
 /////실행을 시키기 위해선 유져ID,비밀번호, 유저등급, 나이, 이름////////////

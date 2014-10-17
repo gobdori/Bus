@@ -1,9 +1,9 @@
 package bus.ui;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.Box;
@@ -11,11 +11,26 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-
-
 public class ObusSeatPnl extends JPanel
 {
+	JButton A1, B1,C1,D1,E1,F1,G1,H1,I1,
+	               A2, B2,C2,D2,E2,F2,G2,H2,I2;
 	RsvPnl sd;
+	
+	ObusSeatPnl(RsvPnl rs, Vector<String> seats)
+	{
+		this(rs);
+		HashMap<String, JButton> buttonMap = new HashMap<String, JButton>();
+		for(int i=0; i<seats.size();i++)
+		{	    
+		    JButton btn = new JButton(seats.get(i));
+		    buttonMap.put(seats.get(i), btn);
+		    		    
+		    JButton myButton = buttonMap.get(seats.get(i));
+		    myButton.setBackground(Color.orange);
+		    myButton.setEnabled(false);
+		}
+	}
 	
 	ObusSeatPnl(RsvPnl rs)
 	{
