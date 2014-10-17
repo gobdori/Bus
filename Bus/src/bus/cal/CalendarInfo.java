@@ -56,7 +56,9 @@ public class CalendarInfo extends JDialog {
 		this.setModal(modal);
 		this.mainFrame = mainFrame;
 		des = this.mainFrame.ComboDepartO.getSelectedItem().toString();
+		System.out.println("출발지"+des);
 		arr = this.mainFrame.ComboArrivalO.getSelectedItem().toString();
+		System.out.println("도착지"+arr);
 				
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		
@@ -177,12 +179,15 @@ public class CalendarInfo extends JDialog {
 			System.out.println(src.getText().toString());
 			String date = year+"-"+(month+1)+"-"+src.getText().toString();
 			
+			System.out.println("db"+date);
 			DbQuery qry = new DbQuery();
-			des = qry.getTmnId(des);
-			arr = qry.getTmnId(arr);
+			String desid = qry.getTmnId(des);
+			System.out.println("출발지id" +desid);
+			String arrid = qry.getTmnId(arr);
+			System.out.println("도착지id" +arrid);
 			//qry.DbBusInfo(date, des, arr);
 						
-			mainFrame.vCBus =qry.getBusList(date, des, arr);
+			mainFrame.vCBus =qry.getBusList(desid, arrid, date);
 			
 			BusTimesTableModel busoModel;	  
 			BusTimesTableModel buspModel;
@@ -190,9 +195,9 @@ public class CalendarInfo extends JDialog {
 			busoModel = new BusTimesTableModel(qry.getObustime());	   
 			buspModel = new BusTimesTableModel(qry.getPbustime());
 			mainFrame.busoModel = busoModel;
-			mainFrame.jto.setModel(mainFrame.busoModel);
+			mainFrame.jto.setModel(busoModel);
 			mainFrame.buspModel = buspModel;
-			mainFrame.jtp.setModel(mainFrame.buspModel);
+			mainFrame.jtp.setModel(buspModel);
 			
 			mainFrame.jto.revalidate();
 			mainFrame.jtp.revalidate();			

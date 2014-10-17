@@ -21,9 +21,9 @@ public class DbQuery
 		DbQuery.userid = userid;
 	}
 
-	static Connection conn;	//연결객체
-	static PreparedStatement pstmt = null;//쿼리를 날리기 위한 어떤 것;;
-	static ResultSet result = null;//쿼리를 보낸 후 받아올 결과값을 저장할 어떤 것.
+	 Connection conn;	//연결객체
+	 PreparedStatement pstmt = null;//쿼리를 날리기 위한 어떤 것;;
+	 ResultSet result = null;//쿼리를 보낸 후 받아올 결과값을 저장할 어떤 것.
 	private static Vector<BusColumn> obustime;//일반버스 시간표 벡터값
 	private static Vector<BusColumn> pbustime;//우등버스 시간표 벡터값
 	
@@ -67,7 +67,7 @@ public class DbQuery
 /////출발지, 도착지, 날짜를 선택 했을 경우 버스 시간표를 가져 오는 메소드////
 /////실행을 시키기 위해선 날짜정보, 출발지정도, 도착지정보가 필요함.    ////
 ///////////////////////////////////////////////////////////////////////
-	public Vector<BusColumn> getBusList(String date, String des, String arr)
+	public Vector<BusColumn> getBusList(String des, String arr, String date)
 	{
 		//쿼리를 보낸 후 result 값을 받은 후에 그 result 값을 넣을 벡터값 생성
 		Vector<BusColumn> busList = new Vector<BusColumn>();
@@ -84,42 +84,61 @@ public class DbQuery
 			//DB에 보낼 쿼리 구문
 			pstmt = conn.prepareStatement("select BUSTIMEID,BUSTYPEID,DESTMNID,ARRTMNID,to_char(bussttime,'HH24:mi') as BUSSTTIME,BUSPRICE,BUSLEADTIME "
 					+ "from view_bustime "
-					+ "where TO_CHAR(BUSSTTIME, 'yyyy-mm-dd') like ? and DESTMNID = ? and ARRTMNID = ?");
-			pstmt.setString(1, date);//쿼리 구문중에 ?에 date를 넣어줌.날짜정보
-			pstmt.setString(2, des);//쿼리 구문중에 ?에 des를 넣어줌.출발지정보
-			pstmt.setString(3, arr);//쿼리 구문중에 ?에 arr를 넣어줌.도착지정보
+					+ "where DESTMNID = ? and ARRTMNID = ? and TO_CHAR(BUSSTTIME, 'yyyy-mm-dd') like ?");
+			date = date+"%";
+			
+			pstmt.setString(1, des);//쿼리 구문중에 ?에 date를 넣어줌.날짜정보
+			System.out.println(des);
+			pstmt.setString(2, arr);//쿼리 구문중에 ?에 des를 넣어줌.출발지정보
+			System.out.println(arr);
+			pstmt.setString(3, date);//쿼리 구문중에 ?에 arr를 넣어줌.도착지정보
+			System.out.println(date);
 			result=pstmt.executeQuery();//쿼리를 DB로 보냄(실행시킨다는 의미)
+					
+			if(result.next())
+			{
+				do
+				{				
+					BusColumn buscol = new BusColumn();//벡터에 들어갈 컬럼값 객체를 생성(이게 아마 vo..)
+					
+					//컬럼이 "BUSTIMEID" 인 결과값을 위에서 생성한 buscol 에 셋팅해줌
+					//buscol 자체가 vo로 생성한 것이기에 vo안에 만든 setter로 셋팅함. 
+					buscol.setBUSTIMEID(result.getString("BUSTIMEID"));
+					buscol.setBUSTYPEID(result.getString("BUSTYPEID"));
+					buscol.setDESTMNID(result.getString("DESTMNID"));
+					buscol.setARRTMNID(result.getString("ARRTMNID"));
+					buscol.setBUSSTTIME(result.getString("BUSSTTIME"));				
+					buscol.setBUSPRICE(result.getInt("BUSPRICE"));
+					buscol.setBUSLEADTIME(result.getString("BUSLEADTIME"));
+					//여기까지 같은 의미 
+					
+					//buscol의 의미는 벡터에 들어갈 한 행을 뜻함. 
+					//벡터 busList 에  buscol를 추가(한 행을 추가한다는 의미)
+					busList.add(buscol);				
+					
+					//우등버스일 경우 들어갈 벡터와
+					//일반버스일 경우 들어갈 벡터에도 값을 넣음
+					if(result.getString("BUSTYPEID").equals("OBUS"))
+					{	
+						System.out.println("obustime");
+						obustime.add(buscol);
+					}
+					else if(result.getString("BUSTYPEID").equals("PBUS"))
+					{					
+						System.out.println("pbustime");
+						pbustime.add(buscol);
+					}
+				}
+				while(result.next());//결과값이 있으면~~~~밑에 부분이 돌아감.		
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(null,"출발버스가 없습니다");
+			}
+			  
 						
-			while(result.next())//결과값이 있으면~~~~밑에 부분이 돌아감.  
-			{				
-				BusColumn buscol = new BusColumn();//벡터에 들어갈 컬럼값 객체를 생성(이게 아마 vo..)
-				
-				//컬럼이 "BUSTIMEID" 인 결과값을 위에서 생성한 buscol 에 셋팅해줌
-				//buscol 자체가 vo로 생성한 것이기에 vo안에 만든 setter로 셋팅함. 
-				buscol.setBUSTIMEID(result.getString("BUSTIMEID"));
-				buscol.setBUSTYPEID(result.getString("BUSTYPEID"));
-				buscol.setDESTMNID(result.getString("DESTMNID"));
-				buscol.setARRTMNID(result.getString("ARRTMNID"));
-				buscol.setBUSSTTIME(result.getString("BUSSTTIME"));				
-				buscol.setBUSPRICE(result.getInt("BUSPRICE"));
-				buscol.setBUSLEADTIME(result.getString("BUSLEADTIME"));
-				//여기까지 같은 의미 
-				
-				//buscol의 의미는 벡터에 들어갈 한 행을 뜻함. 
-				//벡터 busList 에  buscol를 추가(한 행을 추가한다는 의미)
-				busList.add(buscol);				
-				
-				//우등버스일 경우 들어갈 벡터와
-				//일반버스일 경우 들어갈 벡터에도 값을 넣음
-				if(result.getString("BUSTYPEID").equals("OBUS"))
-				{	
-					obustime.add(buscol);
-				}
-				else if(result.getString("BUSTYPEID").equals("PBUS"))
-				{					
-					pbustime.add(buscol);
-				}
-			}			
+			
+			
 		}
 		catch(SQLException e)
 		{
@@ -128,6 +147,16 @@ public class DbQuery
 		}
 		finally
 		{
+			try
+			{
+				result.close();
+				pstmt.close();
+				conn.close();
+			}
+			catch(SQLException e)
+			{
+				JOptionPane.showMessageDialog(null,e.getErrorCode());
+			}
 			
 		}
 		return busList;
@@ -198,7 +227,7 @@ public class DbQuery
 /////터미널ID를 가져오기 위한 메소드/////////////////////////////////////
 /////실행을 시키기 위해선 터미널이름이 필요함.    /////////////////////////
 ///////////////////////////////////////////////////////////////////////
-	public static String getTmnId(String tmnname) 
+	public String getTmnId(String tmnname) 
 	{
 		//실행시킬 쿼리구문을 써놓음
 		String selectTmnId = "SELECT tmnid FROM TMNINFOTBL where tmnname = ?";		
@@ -233,7 +262,7 @@ public class DbQuery
 	}	
 	
 	//위에랑 같음. 여기선 터미널ID로 터미널이름을 찾는 것. 
-	public static Vector<String> getTmnName() 
+	public Vector<String> getTmnName() 
 	{
 		String selectTmnId = "SELECT tmnname FROM TMNINFOTBL";
 		Vector<String> tname = new Vector<String>(); 
@@ -285,6 +314,18 @@ public class DbQuery
 		{
 			JOptionPane.showMessageDialog(null,e.getErrorCode());
 		}
+		finally
+		{
+			try
+			{				
+				pstmt.close();
+				conn.close();
+			}
+			catch(SQLException e)
+			{
+				
+			}
+		}
 		
 	}
 	
@@ -314,7 +355,19 @@ public class DbQuery
 		}
 		catch(SQLException e)
 		{
-			JOptionPane.showMessageDialog(null,e.getErrorCode());
+			JOptionPane.showMessageDialog(null,"인서트 에러"+e.getErrorCode());
+		}
+		finally
+		{
+			try
+			{				
+				pstmt.close();
+				conn.close();
+			}
+			catch(SQLException e)
+			{
+				
+			}
 		}
 		
 	}
@@ -366,6 +419,8 @@ public class DbQuery
 		} finally {
 			try
 			{
+				result.close();
+				pstmt.close();
 				conn.close();
 			}
 			catch(SQLException e)
@@ -376,25 +431,41 @@ public class DbQuery
 		return rsvList;
 	}
 	
-	public Vector<String> selectSeat(String busid)
+	public Vector<String> GetUsedSeat(String busid)
 	{
 		conn =BusDbConnect.getConnect();
 		Vector<String> seats= new Vector<String>();
 		try
 		{
-			pstmt = conn.prepareStatement("select RSVSEAT from RSVINFOTBL where bustimeid = ?");
+			pstmt = conn.prepareStatement("select distinct(RSVSEAT) as RSVSEAT from RSVINFOTBL where bustimeid = ?");
 			pstmt.setString(1, busid);
 			result = pstmt.executeQuery();
 			
+			System.out.println("시작한다. ");
 			while(result.next())
 			{
+				System.out.println("있다. ");
 				seats.add(result.getString("RSVSEAT"));
+				System.out.println(result.getString("RSVSEAT"));
 			}
 		}
 		catch(SQLException e)
 		{
 			JOptionPane.showMessageDialog(null,"selectSeat"+e.getErrorCode());
 		}		
+		finally
+		{
+			try
+			{
+				result.close();
+				pstmt.close();
+				conn.close();
+			}
+			catch(SQLException e)
+			{
+				
+			}
+		}
 		return seats;
 	}
 ////////////////////////////////////////////////////////////////////////
@@ -451,8 +522,7 @@ public class DbQuery
 		finally
 		{
 			try 
-			{
-				if(result != null) result.close();
+			{		
 				if(pstmt != null) pstmt.close();
 				if(conn != null) conn.close();
 			} 

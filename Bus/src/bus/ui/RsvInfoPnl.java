@@ -18,15 +18,17 @@ import bus.db.RsvColumn;
 
 public class RsvInfoPnl extends JPanel {
 
-	Vector<RsvColumn> progressList;
-	DbQuery dao;
-	JTable rsvTable;
-	RsvTableModel progressModel;
+	Vector<RsvColumn> rsvList;
+	static DbQuery dao=new DbQuery();;
+	static JTable rsvTable;
+	static RsvTableModel rsvTblModel;
 	JButton btnSign;
 	String userid = DbQuery.getUserid();
-
-	RsvInfoPnl() {
-
+	RsvInfoPnl rsinfopnl;
+	
+	RsvInfoPnl(){
+		
+		rsinfopnl=this;
 		/* 메인프레임 north */
 		JLabel titleLabel = new JLabel("버스리스트");
 		titleLabel.setFont(new Font("굴림체", Font.BOLD, 15));
@@ -41,7 +43,7 @@ public class RsvInfoPnl extends JPanel {
 		// ProgressMangerDao 객체를 생성하고 progress테이블에 출력할 데이터를 db로 부터 읽어온다.
 
 		dao = new DbQuery();
-		progressList = dao.getRsvList(userid);
+		rsvList = dao.getRsvList(userid);
 
 		/*
 		 * progress 리스트를 출력할 JTable 객체 생성 AbstractTableModel을 상속받아 추상메소드를 구현한
@@ -49,8 +51,8 @@ public class RsvInfoPnl extends JPanel {
 		 * ProgressTableModel 객체를 생성하고 progressTable의 생성자의인수로 지정하여
 		 * progressTable의 객체를 생성한다.
 		 */
-		progressModel = new RsvTableModel(progressList);
-		rsvTable = new JTable(progressModel);
+		rsvTblModel = new RsvTableModel(rsvList);
+		rsvTable = new JTable(rsvTblModel);
 
 		/*
 		 * progress 테이블이 생성되면서 컬럼크기를 자동으로 조절하지 못하게 설정하고 테이블의 각 컬럼의 너비를 사용자가 조정할수

@@ -27,6 +27,7 @@ import bus.cal.CalendarInfo;
 import bus.db.BusColumn;
 import bus.db.BusTimesTableModel;
 import bus.db.DbQuery;
+import bus.db.RsvTableModel;
 
 public class RsvPnl extends JPanel {
 	
@@ -49,7 +50,13 @@ public class RsvPnl extends JPanel {
 	RsvPnl thispnl;
 	String username = "";
 	String userid =DbQuery.getUserid();
-	
+	JPanel p1 = new JPanel();
+	JPanel p2 = new JPanel();	
+	JScrollPane jtoScroll = new JScrollPane();
+	JScrollPane jtpScroll = new JScrollPane();
+	ObusSeatPnl oSeatsPnl = new ObusSeatPnl(this);
+	PbusSeatPnl pSeatsPnl = new PbusSeatPnl(this);
+	RsvInfoPnl rsvInfoPnl = new RsvInfoPnl();
 	// 패키지
 	String[] packageArea = {"[전주 한옥마을] 우리나라 전통이 살아 숨쉬는 곳",
 			"[경주 보문관광단지] 경주의 사랑방으로 불리는 종합관광휴양지",
@@ -202,46 +209,8 @@ public class RsvPnl extends JPanel {
 	  txt1.setPreferredSize(new Dimension(140,90));
 	  txt2.setPreferredSize(new Dimension(140,90));
 	  txt3.setPreferredSize(new Dimension(140,90));
-	  	  
-	  jto.addMouseListener(new MouseAdapter()
-	  {	
-			@Override
-			public void mouseClicked(MouseEvent e) 
-			{
-				if(e.getButton() == 1 && e.getClickCount() == 2) 
-				{
-					int rowIndex = jto.getSelectedRow();										
-					BusColumn buscol = busoModel.getRowData(rowIndex);
-					JOptionPane.showMessageDialog(null,rowIndex+"-"+buscol.getBUSTIMEID());					
-				}
-			}
-		});
 	  
-	  jto.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	  	  
-	  jtp.addMouseListener(new MouseAdapter(){
-			@Override
-			public void mouseClicked(MouseEvent e) 
-			{
-				if(e.getButton() == 1 && e.getClickCount() == 2) 
-				{
-					int rowIndex = jtp.getSelectedRow();		
-////////////////////////////////////////////////////////////////////////////////////////////////////					
-					BusColumn buscol = buspModel.getRowData(rowIndex);
-					String busid = buscol.getBUSTIMEID();
-					DbQuery db = new DbQuery();
-					Vector<String> Seats = db.selectSeat(busid);
-					
-					//ObusSeatPnl(this, Seats);
-					
-					JOptionPane.showMessageDialog(null,rowIndex+"-"+buscol.getBUSTIMEID());				
-				}
-			}
-		});
-	  
-	  jtp.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	  
-	  JScrollPane jtoScroll = new JScrollPane(jto,
+	  jtoScroll = new JScrollPane(jto,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 	  jtoScroll.setPreferredSize(new Dimension(100,120));
@@ -254,13 +223,21 @@ public class RsvPnl extends JPanel {
 	  jtpScroll.setPreferredSize(new Dimension(100,110));
 	  jtpScroll.setMaximumSize(new Dimension(100,120));
 	  jtpScroll.setMinimumSize(new Dimension(100,120));
+	  	  
+	  jto.addMouseListener(new JtableSelectListener());
+	  
+	  jto.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	  	  
+	  jtp.addMouseListener(new JtableSelectListener());
+	  
+	  jtp.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);  
 	  
 	  
-	  p1.add(new ObusSeatPnl(this));
-	  p1.add(new JScrollPane(jtoScroll));    
-	  p2.add(new PbusSeatPnl(this));    
+	  p1.add(oSeatsPnl);
+	  p1.add(new JScrollPane(jtoScroll));  
+	  p2.add(pSeatsPnl);    
 	  p2.add(new JScrollPane(jtpScroll));
-                  
+
     // 탭 이름을 추가함
 	  timeTabb.addTab("일반", p1);
 	  timeTabb.addTab("우등", p2);
@@ -270,14 +247,15 @@ public class RsvPnl extends JPanel {
         	{
         		jtp.clearSelection();
         		p2.removeAll();
-        		p2.add(new PbusSeatPnl(thispnl));
+        		p2.add(pSeatsPnl = new PbusSeatPnl(thispnl));
         		p2.add(new JScrollPane(jtpScroll));
+        		
         	}
         	else if(timeTabb.getSelectedIndex()==1)
         	{
         		jto.clearSelection();
         		p1.removeAll();
-        		p1.add(new ObusSeatPnl(thispnl));
+        		p1.add(oSeatsPnl = new ObusSeatPnl(thispnl));
         		p1.add(new JScrollPane(jtoScroll));
         	}
         	seats.removeAllElements();       	        	
@@ -412,8 +390,7 @@ public class RsvPnl extends JPanel {
 						return;
 					}
 					BusColumn buscol = busoModel.getRowData(jto.getSelectedRow());
-					String busid = buscol.getBUSTIMEID();
-					
+					String busid = buscol.getBUSTIMEID();					
 					for(int i=0 ; seats.size()>i;i++)
 					{
 						DbQuery db = new DbQuery();
@@ -432,18 +409,24 @@ public class RsvPnl extends JPanel {
 						JOptionPane.showMessageDialog(null,"좌석을 선택해주세요.");
 						return;
 					}
-					BusColumn buscol = busoModel.getRowData(jtp.getSelectedRow());
-					String busid = buscol.getBUSTIMEID();
+					BusColumn buscol = busoModel.getRowData(jtp.getSelectedRow());					
+					String busid = buscol.getBUSTIMEID();		
 					
 					for(int i=0 ; seats.size()>i;i++)
 					{
 						DbQuery db = new DbQuery();
 						db.istRsv(userid, busid, seats.get(i));
-					}
+					}					
 				}
-				RsvInfoPnl asd = new RsvInfoPnl();
-				asd.rsvTable.revalidate();
-				asd.rsvTable.repaint();
+							
+				rsvInfoPnl.rsvList =rsvInfoPnl.dao.getRsvList(userid);
+				System.out.println("asdf"+userid);	
+				rsvInfoPnl.rsvTblModel = new RsvTableModel(rsvInfoPnl.rsvList);
+				rsvInfoPnl.rsvTable.setModel(rsvInfoPnl.rsvTblModel);	
+				pSeatsPnl.setSeat(new Vector<String>());
+				oSeatsPnl.setSeat(new Vector<String>());
+				jto.clearSelection();
+				jtp.clearSelection();
 			}		
 		}
 	}
@@ -454,6 +437,47 @@ public class RsvPnl extends JPanel {
 		public void itemStateChanged(ItemEvent e){
 
 			
+		}
+	}
+	
+	private class JtableSelectListener extends MouseAdapter{
+		@Override
+		public void mouseClicked(MouseEvent e) 
+		{
+			JTable tbl = (JTable) e.getSource();
+				
+			if(tbl ==jto)
+			{				
+				//if(e.getButton() == 1 && e.getClickCount() == 2) 
+				//{
+					pSeatsPnl.setSeat(new Vector<String>());
+					System.out.println("일반");
+					int rowIndex = jto.getSelectedRow();					
+					BusColumn buscol = busoModel.getRowData(rowIndex);
+					String busid = buscol.getBUSTIMEID();
+					DbQuery db = new DbQuery();
+					Vector<String> Seats = db.GetUsedSeat(busid);
+					System.out.println(Seats);
+					oSeatsPnl.setSeat(Seats);				
+					JOptionPane.showMessageDialog(null,rowIndex+"-"+buscol.getBUSTIMEID());				
+				//}				
+			}
+			else if(tbl ==jtp)
+			{
+				//if(e.getButton() == 1 && e.getClickCount() == 2) 
+				//{
+					pSeatsPnl.setSeat(new Vector<String>());
+					System.out.println("우등");
+					int rowIndex = jtp.getSelectedRow();					
+					BusColumn buscol = buspModel.getRowData(rowIndex);
+					String busid = buscol.getBUSTIMEID();
+					DbQuery db = new DbQuery();
+					Vector<String> Seats = db.GetUsedSeat(busid);
+					System.out.println(Seats);
+					pSeatsPnl.setSeat(Seats);
+					JOptionPane.showMessageDialog(null,rowIndex+"-"+buscol.getBUSTIMEID());				
+				//}				
+			}
 		}
 	}
 	
