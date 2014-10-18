@@ -26,7 +26,7 @@ public class RsvTableModel extends AbstractTableModel {
 		// 컬럼명은 상수로 정의된 배열을 지정하여 인스턴스 변수에 저장하는 다른 생성자를 호출하고 있다.
 		this(new Vector<RsvColumn>(), TABLE_COLUMNS);
 	}
-
+	
 	public RsvTableModel(Vector<RsvColumn> progressList) {
 		this(progressList, TABLE_COLUMNS);
 	}

@@ -94,9 +94,8 @@ public class RsvInfoPnl extends JPanel {
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 		/* 테이블의 크기를 지정하고 있다. */
-		rsvTable
-				.setPreferredScrollableViewportSize(new Dimension(575, 210));
-		
+		rsvTable.setPreferredScrollableViewportSize(new Dimension(575, 210));
+		rsvTable.setEditingColumn(0);
 
 		/* 테이블의 header와 행의 높이를 설정한다. 
 		progressTable.getTableHeader().setPreferredSize(new Dimension(0, 30));

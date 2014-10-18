@@ -16,11 +16,16 @@ private String ARRNAME;
 private String RSVTRIP;
 private String RSVDATE;
 private Number PAYMONEY;
+private Number BUSPRICE;
 private String USERGRADE;
 private String HANDYCAP;
 
-
-
+public Number getBUSPRICE() {
+	return BUSPRICE;
+}
+public void setBUSPRICE(Number bUSPRICE) {
+	BUSPRICE = bUSPRICE;
+}
 
 public String getRSVSTATEID() {
 	return RSVSTATEID;

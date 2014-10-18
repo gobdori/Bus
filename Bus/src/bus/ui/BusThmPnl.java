@@ -23,7 +23,7 @@ public class BusThmPnl extends JPanel
 		this.setMaximumSize(new Dimension(620,410));		
 		
 		//탭 패널을 추가.혹시나 몰라서 스크롤 되도록 넣음. 
-		this.add(new JScrollPane(new pnl()));		
+		//this.add(new JScrollPane(new pnl()));		
 	}
 }
 

@@ -333,21 +333,25 @@ public class DbQuery
 /////버스 예약시 DB에 예약 정보를 저장시키는 메소드(INSERT)/////////////
 /////실행을 시키기 위해선 유져ID,버스시간ID,좌석정보가 필요함////////////
 ///////////////////////////////////////////////////////////////////////
-	public void istRsv(String userid, String bustimeid, String rsvseat)
+	public void istRsv(String userid, String bustimeid, String rsvseat, int paymoney, String usergrade)
 	{
 		conn =BusDbConnect.getConnect(); 
 		
 		try
 		{
 			pstmt = conn.prepareStatement(
-					"insert into RSVINFOTBL(rsvid, userid, bustimeid, rsvseat, rsvstateid, rsvdate)"
-					+ "values(SEQ_RSVINFO.NEXTVAL, ? , ?, ?,'beforepaid',SYSDATE)");
+					"insert into RSVINFOTBL(rsvid, userid, bustimeid, rsvseat, rsvstateid, rsvdate,paymoney,usergrade)"
+					+ "values(SEQ_RSVINFO.NEXTVAL, ? , ?, ?,'beforepaid',SYSDATE,?,?)");
 			pstmt.setString(1, userid);
 			System.out.println(userid);
 			pstmt.setString(2, bustimeid);
 			System.out.println(bustimeid);
 			pstmt.setString(3, rsvseat);
 			System.out.println(rsvseat);
+			pstmt.setInt(4, paymoney);
+			System.out.println(paymoney);
+			pstmt.setString(5, usergrade);
+			System.out.println(usergrade);
 			
 			int results = pstmt.executeUpdate();
 			if(results !=1)
@@ -373,14 +377,13 @@ public class DbQuery
 	}
 	
 ////////////////////////////////////////////////////////////////////////
-/////회원 가입시 DB에 회원 정보를 저장시키는 메소드(INSERT)/////////////
-/////실행을 시키기 위해선 유져ID,비밀번호, 유저등급, 나이, 이름////////////
-/////주소, 생일, 이메일, 폰 정보가 필요함. ////////////////////////////////
+/////예약 테이블을 불러오기 위한 메소드  /////////////
+/////실행을 시키기 위해선 유져ID가 필요함////////////
 ///////////////////////////////////////////////////////////////////////	
-	public Vector<RsvColumn> getRsvList(String name) {
+	public Vector<RsvColumn> getRsvList(String name){
 
 		String qry = "select rsvid, userid, rsvseat, rsvstateid, paymentid, rsvtrip, "
-				+ "rsvdate, paymoney, usergrade, handycap, bustimeid, "
+				+ "rsvdate, paymoney,busprice ,usergrade, handycap, bustimeid, "
 				+ "bussttime, destmnid, arrtmnid, desname, arrname from view_rsv where userid = ?";
 
 		Vector<RsvColumn> rsvList = new Vector<RsvColumn>();
@@ -401,7 +404,8 @@ public class DbQuery
 				rsvCol.setRSVSTATEID(result.getString("rsvstateid"));
 				rsvCol.setPAYMENTID(result.getString("paymentid"));				
 				rsvCol.setRSVDATE(result.getString("rsvdate"));
-				rsvCol.setPAYMONEY(result.getInt("paymoney"));				
+				rsvCol.setPAYMONEY(result.getInt("paymoney"));
+				rsvCol.setBUSPRICE(result.getInt("busprice"));
 				rsvCol.setHANDYCAP(result.getString("handycap"));
 				rsvCol.setBUSTIMEID(result.getString("bustimeid"));
 				rsvCol.setBUSSTTIME(result.getString("bussttime"));
@@ -415,7 +419,7 @@ public class DbQuery
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-			System.out.println("ProgressManagerDao - getProgressList()");
+			System.out.println("getRsvList"+e.getErrorCode());
 		} finally {
 			try
 			{
@@ -441,12 +445,10 @@ public class DbQuery
 			pstmt.setString(1, busid);
 			result = pstmt.executeQuery();
 			
-			System.out.println("시작한다. ");
+			
 			while(result.next())
-			{
-				System.out.println("있다. ");
-				seats.add(result.getString("RSVSEAT"));
-				System.out.println(result.getString("RSVSEAT"));
+			{		
+				seats.add(result.getString("RSVSEAT"));		
 			}
 		}
 		catch(SQLException e)
