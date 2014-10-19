@@ -16,14 +16,14 @@ public class BusThmPnl extends JPanel
 {
 	//downbox 안에 들어갈 패널 생성자.
 	public BusThmPnl()
-	{
+	{		
 		//패널 크기 
 		this.setPreferredSize(new Dimension(620,410));		
 		this.setMaximumSize(new Dimension(620,410));
 		this.setMaximumSize(new Dimension(620,410));		
 		
 		//탭 패널을 추가.혹시나 몰라서 스크롤 되도록 넣음. 
-		//this.add(new JScrollPane(new pnl()));		
+		this.add(new JScrollPane(new pnl()));		
 	}
 }
 
@@ -33,6 +33,9 @@ class pnl extends JPanel
 {
 	public pnl()
 	{
+		this.setPreferredSize(new Dimension(620,410));		
+		this.setMaximumSize(new Dimension(620,410));
+		this.setMaximumSize(new Dimension(620,410));	
 		//패널에 탭으로 꽉 차야 하므로 Borderlayout
 		this.setLayout(new BorderLayout());
 		
@@ -49,11 +52,11 @@ class pnl extends JPanel
 		JScrollPane scrollPane = new JScrollPane(tap);
 		
 		//스크롤이 가능하게 된 tab(scrollPane)을 pnl 패널에 넣음
-		this.add(scrollPane,"Center");
+		this.add(scrollPane);
 	}
 }
 
-//tab 안에 있는 패널에 넣어야 하는 패널
+//tab 안에 넣어야 하는 패널
 class tabpnl extends JPanel
 {
    public tabpnl(String tabname)

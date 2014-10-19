@@ -38,11 +38,10 @@ public class RsvPnl extends JPanel {
 	JScrollPane jtoScroll = new JScrollPane();
 	JScrollPane jtpScroll = new JScrollPane();
 	JButton btngoCal, btnbackCal, btnRsvn;
-	JPanel p1 = new JPanel();
-	JPanel p2 = new JPanel();
 	JTabbedPane timeTabb;
 	ButtonGroup bg;
 	Vector<String> loc;
+	Vector<String> pkg;
 	Vector<String> seats=new Vector<String>() ;
 	Vector<String> adultSeats=new Vector<String>() ;
 	Vector<String> childSeats=new Vector<String>() ;
@@ -50,8 +49,8 @@ public class RsvPnl extends JPanel {
 	public JComboBox ComboDepartO, ComboArrivalO, ComboDepartB, ComboArrivalB,
 				     ComboPackage, ComboAdult, ComboChild, ComboDisabled;
 	public static final int ButtonGroup = 0;
-	public JTable jto = new JTable();
-	public JTable jtp = new JTable();	
+	public JTable tblObusTime = new JTable();
+	public JTable tblPbusTime = new JTable();	
 	public Vector<BusColumn> vCBus;
 	public BusTimesTableModel busoModel = new BusTimesTableModel(); 
 	public BusTimesTableModel buspModel = new BusTimesTableModel();
@@ -65,16 +64,6 @@ public class RsvPnl extends JPanel {
 	ObusSeatPnl oSeatsPnl = new ObusSeatPnl(this);
 	PbusSeatPnl pSeatsPnl = new PbusSeatPnl(this);
 	RsvInfoPnl rsvInfoPnl = new RsvInfoPnl();
-	// 패키지
-	String[] packageArea = {"[전주 한옥마을] 우리나라 전통이 살아 숨쉬는 곳",
-			"[경주 보문관광단지] 경주의 사랑방으로 불리는 종합관광휴양지",
-			"[부산 남포동 국제시장] 다양한 상품들이 공급되는 종합재래시장",
-			"[포항 덕동문화마을] 300년 세월이 깃든 전통마을과 아름다운 숲",
-			"[양양 낙산사] 화마를 이겨낸 해수관음의 성지",
-			"[정선 그림바위마을] 세 가지 시선을 따라 걷는 마을길",
-			"[합천 문화재여행] 국보 문화재와 함께하는 여행",
-			"[안동 하회마을] 전통이 살아 숨쉬는 민속마을"
-			};
 	
 	// 인원수 리스트
 	String[] adult = {"0", "1", "2", "3", "4", "5"};	// 성인
@@ -87,11 +76,15 @@ public class RsvPnl extends JPanel {
 		//출발지 와 도착지 값 가져오기
 		DbQuery dbq = new DbQuery();
 		loc =dbq.getTmnName();
+		//패키지값 가져오기
+		pkg =dbq.getPkgName();
+		//자기 자신을 받는 값을 선언
 		thispnl = this;
 
+		//크기 정의
 		this.setPreferredSize(new Dimension(620,410));
-		//this.setMaximumSize(new Dimension(620,410));
-		//this.setMaximumSize(new Dimension(620,410));		
+		this.setMaximumSize(new Dimension(620,410));
+		this.setMaximumSize(new Dimension(620,410));		
 				
 		//	구입방법 라디오버튼 (편도/왕복/패키지) 그룹 생성
 		// 라디오버튼 그룹 생성
@@ -121,7 +114,7 @@ public class RsvPnl extends JPanel {
 		
 		// 출발 라벨 & 출발도시 콤보박스
 		lbldepart = new JLabel("출발");
-		ComboDepartO = new JComboBox( loc);	
+		ComboDepartO = new JComboBox(loc);	
 		
 		// 도착 라벨 & 도착도시 콤보박스
 		lblarrival = new JLabel("도착");
@@ -180,7 +173,7 @@ public class RsvPnl extends JPanel {
 		paBox.setMinimumSize(new Dimension(400,20));
 		
 		// 패키지 콤보박스 생성
-		ComboPackage = new JComboBox(packageArea);
+		ComboPackage = new JComboBox(pkg);
 		ComboPackage.setPreferredSize(new Dimension(325,20));
 		ComboPackage.setMaximumSize(new Dimension(325,20));
 		ComboPackage.setMinimumSize(new Dimension(325,20));
@@ -192,77 +185,84 @@ public class RsvPnl extends JPanel {
 
 		//	버스 종류(일반/우등/야간)별 시간표 (timeBox : BoxLayout)
 		Box timeBox = Box.createHorizontalBox();
-		timeBox.setPreferredSize(new Dimension(600,190));
-		timeBox.setMaximumSize(new Dimension(600,190));
-		timeBox.setMinimumSize(new Dimension(600,190));
+		timeBox.setPreferredSize(new Dimension(580,190));
+		timeBox.setMaximumSize(new Dimension(580,190));
+		timeBox.setMinimumSize(new Dimension(580,190));
 
 		// 탭을 생성하고 만들어진 탭은 위로 노출되도록 설정 
 		timeTabb = new JTabbedPane();
 		timeTabb.setTabPlacement(JTabbedPane.TOP);
 
 		// 만들어진 각 탭안에 패널을 생성
-		JPanel p1 = new JPanel();	// '일반'탭 안의 패널
-		JPanel p2 = new JPanel();	// '우등'탭 안의 패널
-		JPanel p3 = new JPanel();	// '야간'탭 안의 패널
-		JPanel p4 = new JPanel();
-		
-		JLabel txt1 = new JLabel("JTable 일반 시간표");
-		JLabel txt2 = new JLabel("JTable 우등 시간표");
-		JLabel txt3 = new JLabel("JTable 야간 시간표");
-	    
-		txt1.setPreferredSize(new Dimension(140,90));
-		txt2.setPreferredSize(new Dimension(140,90));
-		txt3.setPreferredSize(new Dimension(140,90));
-	  
-		jtoScroll = new JScrollPane(jto,
+		JPanel pnlOBusMain = new JPanel();	// '일반'탭 안의 패널
+		JPanel pnlPBusMain = new JPanel();	// '우등'탭 안의 패널
+
+		//버스시간표(일반)를 스크롤 형식으로 넣음
+		jtoScroll = new JScrollPane(tblObusTime,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		jtoScroll.setPreferredSize(new Dimension(100,120));
 		jtoScroll.setMaximumSize(new Dimension(100,120));
 		jtoScroll.setMinimumSize(new Dimension(100,120));
 	  
-		JScrollPane jtpScroll = new JScrollPane(jtp,
+		//버스시간표(우등)를 스크롤 형식으로 넣음
+		JScrollPane jtpScroll = new JScrollPane(tblPbusTime,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		jtpScroll.setPreferredSize(new Dimension(100,110));
 		jtpScroll.setMaximumSize(new Dimension(100,120));
 		jtpScroll.setMinimumSize(new Dimension(100,120));
-	  	  
-		jto.addMouseListener(new JtableSelectListener());
+	  	
+		//버스시간표(일반, 우등)에 마우스리스너 연결(선택시 이벤트 발생하게)
+		tblObusTime.addMouseListener(new JtableSelectListener());	  
+		tblObusTime.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);	  	  
+		tblPbusTime.addMouseListener(new JtableSelectListener());	  
+		tblPbusTime.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);  
 	  
-		jto.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	  	  
-		jtp.addMouseListener(new JtableSelectListener());
-	  
-		jtp.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);  
-	  
-	  
-		p1.add(oSeatsPnl);
-		p1.add(new JScrollPane(jtoScroll));  
-		p2.add(pSeatsPnl);    
-		p2.add(new JScrollPane(jtpScroll));
+		//버스패널에 좌석과 시간표를 넣음
+		pnlOBusMain.add(oSeatsPnl);
+		pnlOBusMain.add(new JScrollPane(jtoScroll));  
+		pnlPBusMain.add(pSeatsPnl);    
+		pnlPBusMain.add(new JScrollPane(jtpScroll));
 
-		//탭 이름을 추가함
-		timeTabb.addTab("일반", p1);
-		timeTabb.addTab("우등", p2);
+		//탭 이름과 해당 패널을 추가함
+		timeTabb.addTab("일반", pnlOBusMain);
+		timeTabb.addTab("우등", pnlPBusMain);
+		//탭 클릭시 일어날 리스너 생성
 		timeTabb.addChangeListener( new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
+				//일반버스탭 클릭시
 				if(timeTabb.getSelectedIndex()==0)
 				{
-					jtp.clearSelection();
-					p2.removeAll();
-					p2.add(pSeatsPnl = new PbusSeatPnl(thispnl));
-					p2.add(new JScrollPane(jtpScroll));
-					
+					//좌석정보가 들어간 배열 초기화
+					seats.removeAllElements();
+					//어른좌석정보가 들어간 배열 초기화
+					adultSeats.removeAllElements();
+					//아이좌석정보가 들어간 배열 초기화
+					childSeats.removeAllElements();
+					//장애인좌석정보가 들어간 배열 초기화
+					handySeats.removeAllElements();
+					//우등버스시간표 초기화
+					tblPbusTime.clearSelection();
+					//우등버스좌석 초기화
+					pSeatsPnl.setSeat(seats);
 				}
+				//우등버스탭 클릭시
 				else if(timeTabb.getSelectedIndex()==1)
 				{
-					jto.clearSelection();
-					p1.removeAll();
-					p1.add(oSeatsPnl = new ObusSeatPnl(thispnl));
-					p1.add(new JScrollPane(jtoScroll));
-				}
-				seats.removeAllElements();       	        	
+					//좌석정보가 들어간 배열 초기화
+					seats.removeAllElements();
+					//어른좌석정보가 들어간 배열 초기화
+					adultSeats.removeAllElements();
+					//아이좌석정보가 들어간 배열 초기화
+					childSeats.removeAllElements();
+					//장애인좌석정보가 들어간 배열 초기화
+					handySeats.removeAllElements();
+					//일반버스시간표 초기화
+					tblObusTime.clearSelection();		
+					//일반버스좌석 초기화
+					oSeatsPnl.setSeat(seats);					
+				}				
 			}
 		});
         
@@ -271,21 +271,31 @@ public class RsvPnl extends JPanel {
 		
 		//인원수 (peBox : BoxLayout)
 		Box peBox = Box.createHorizontalBox();
+		peBox.setPreferredSize(new Dimension(550, 20));
+		peBox.setMinimumSize(new Dimension(550, 20));
+		peBox.setMaximumSize(new Dimension(550, 20));
+		
 		
 		// 성인 라벨 & 성인 인원수 콤보박스
 		lblAdult = new JLabel("성인");
 		ComboAdult = new JComboBox(adult);
 		ComboAdult.addActionListener(new ComboItemListener());
+		ComboAdult.setEnabled(false);
+		ComboAdult.setEditable(false);
 		
 		// 아동 라벨 & 아동 인원수 콤보박스
 		lblChild = new JLabel("7세 미만");
 		ComboChild = new JComboBox(child);
 		ComboChild.addActionListener(new ComboItemListener());
+		ComboChild.setEnabled(false);
+		ComboChild.setEditable(false);
 		
 		// 장애인 라벨 & 장애인 인원수 콤보박스
 		lblDisabled = new JLabel("장애인");
 		ComboDisabled = new JComboBox(handicap);
 		ComboDisabled.addActionListener(new ComboItemListener());
+		ComboDisabled.setEnabled(false);
+		ComboDisabled.setEditable(false);
 		
 		//예약하기 버튼 클릭 시, 우측 패널 (RsvInfoPnl.java)로 데이터가 넘어가야 함
 		btnRsvn = new JButton("예약하기");
@@ -350,67 +360,103 @@ public class RsvPnl extends JPanel {
 		
 		}
 	
+	//좌석정보랑 시간을 초기화하는 메소드
+	public void removeSeats()
+	{
+		seats.removeAllElements();
+		adultSeats.removeAllElements();
+		childSeats.removeAllElements();
+		handySeats.removeAllElements();
+		
+		tblPbusTime.clearSelection();					
+		pSeatsPnl.setSeat(seats);
+		
+		tblObusTime.clearSelection();
+		oSeatsPnl.setSeat(seats);		
+	}
+	
 	// 버튼에 대한 리스너
-	private class ButtonActionListener implements ActionListener {
+	private class ButtonActionListener implements ActionListener 
+	{
 		
 		@Override
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e) 
+		{
+			//눌러진 버튼에 대한 정보를 btn에 담는다			
 			JButton btn = (JButton) e.getSource();
-			CalendarInfo sub = new CalendarInfo(RsvPnl.this, true);
+			
+			//달력 객체를 생성해 놓는다. 
+			CalendarInfo sub = new CalendarInfo(thispnl, true);
+			
+			//가늘날 버튼을 눌렀을 경우
 			if (btn == btngoCal) 
-			{				
+			{
+				//달력 객체 타이틀을 변경후 보여줌. 
 				sub.setTitle("가는날 일정 선택");
 				sub.setVisible(true);
 			} 
+			//오는날 버튼을 눌렀을 경우
 			else if (btn == btnbackCal) 
-			{				
+			{	//달력 객체 타이틀을 변경후 보여줌. 			
 				sub.setTitle("오는날 일정 선택");
 				sub.setVisible(true);
 			}
+			//예약하기 버튼을 눌렀을 경우. 
 			else if (btn == btnRsvn) 
 			{	
-				// RsvnfoPnl로 데이터가 넘어가야 함				
+				//선택된 좌석이 0개 인 경우				
 				if(seats.size() == 0)
-				{
+				{	//좌석을 선택하라는 알림창이 뜸
 					JOptionPane.showMessageDialog(null,"좌석을 선택해주세요.");
 				}				
+				//일반 버스 
 				else if(timeTabb.getSelectedIndex()==0)
-				{
-					if(jto.getSelectedRow() ==-1)
+				{	//시간표가 선택되지 않았을 경우
+					if(tblObusTime.getSelectedRow() ==-1)
 					{
 						JOptionPane.showMessageDialog(null,"시간을 선택해주세요.");
 						return;
 					}
+					//좌석이 선택되지 않았을 경우
 					else if(seats.size()==0)
 					{
 						JOptionPane.showMessageDialog(null,"좌석을 선택해주세요.");
 						return;
 					}
-					BusColumn buscol = busoModel.getRowData(jto.getSelectedRow());
-					String busid = buscol.getBUSTIMEID();	
-					int busprice = buscol.getBUSPRICE();
 					
+					//좌석이랑 시간이 선택 된 경우//
+					//일반버스시간표(테이블)에서 선택된 행(index)값을 얻은 후
+					//테이블에 적용된 테이블모델의 값(data)을 얻어서					
+					BusColumn buscol = busoModel.getRowData(tblObusTime.getSelectedRow());
+					//그 값들 중 버스ID랑, 가격을 알아 온다. 
+					String busid = buscol.getBUSTIMEID();//버스ID
+					int busprice = buscol.getBUSPRICE();//일반가격
+					int chprice = (int)(busprice*0.7);//소인가격
+					int hdprice = (int)(busprice*0.5);//장애인가격
+					
+					//성인좌석을 예약
 					for(int i=0 ; adultSeats.size()>i;i++)
 					{
 						DbQuery db = new DbQuery();
-						db.istRsv(userid, busid, seats.get(i),busprice, "ADULT" );
+						db.istRsv(userid, busid, adultSeats.get(i),busprice, "ADULT" );
 					}
-					
+					//소인좌석을 예약
 					for(int i=0 ; childSeats.size()>i;i++)
 					{
 						DbQuery db = new DbQuery();
-						db.istRsv(userid, busid, seats.get(i),busprice, "CHILD" );
+						db.istRsv(userid, busid, childSeats.get(i),chprice, "CHILD" );						
 					}
-					
+					//장애인좌석을 예약
 					for(int i=0 ; handySeats.size()>i;i++)
 					{
 						DbQuery db = new DbQuery();
-						db.istRsv(userid, busid, seats.get(i),busprice, "CHILD" );
+						db.istRsv(userid, busid, handySeats.get(i),hdprice, "HANDY" );						
 					}
-				}									
+				}
+				//우등버스가 선택된 경우-일반인 경우의 주석을 참고. 
 				else if( timeTabb.getSelectedIndex()==1)
 				{
-					if(jtp.getSelectedRow() ==-1)
+					if(tblPbusTime.getSelectedRow() ==-1)
 					{
 						JOptionPane.showMessageDialog(null,"시간을 선택해주세요.");
 						return;
@@ -420,37 +466,40 @@ public class RsvPnl extends JPanel {
 						JOptionPane.showMessageDialog(null,"좌석을 선택해주세요.");
 						return;
 					}
-					BusColumn buscol = busoModel.getRowData(jtp.getSelectedRow());					
+					BusColumn buscol = busoModel.getRowData(tblPbusTime.getSelectedRow());					
 					String busid = buscol.getBUSTIMEID();	
 					int busprice = buscol.getBUSPRICE();
+					int chprice = (int)(busprice*0.7);
+					int hdprice = (int)(busprice*0.5);
 					
 					for(int i=0 ; adultSeats.size()>i;i++)
 					{
 						DbQuery db = new DbQuery();
-						db.istRsv(userid, busid, seats.get(i),busprice, "ADULT" );
+						db.istRsv(userid, busid, adultSeats.get(i),busprice, "ADULT" );
 					}
 					
 					for(int i=0 ; childSeats.size()>i;i++)
 					{
 						DbQuery db = new DbQuery();
-						db.istRsv(userid, busid, seats.get(i),busprice, "CHILD" );
+						db.istRsv(userid, busid, childSeats.get(i),chprice, "CHILD" );						
 					}
 					
 					for(int i=0 ; handySeats.size()>i;i++)
 					{
 						DbQuery db = new DbQuery();
-						db.istRsv(userid, busid, seats.get(i),busprice, "CHILD" );
-					}				
+						db.istRsv(userid, busid, handySeats.get(i),hdprice, "HANDY" );						
+					}	
 				}
 							
+				//예약정보 패널에 업데이트를 하기위한 구문
+				//예약리스트에 넣을 정보를 받아온다
 				rsvInfoPnl.rsvList =rsvInfoPnl.dao.getRsvList(userid);
-				System.out.println("asdf"+userid);	
+				//받아온 예약리스트를 테이블모델에 적용
 				rsvInfoPnl.rsvTblModel = new RsvTableModel(rsvInfoPnl.rsvList);
-				rsvInfoPnl.rsvTable.setModel(rsvInfoPnl.rsvTblModel);	
-				pSeatsPnl.setSeat(new Vector<String>());
-				oSeatsPnl.setSeat(new Vector<String>());
-				jto.clearSelection();
-				jtp.clearSelection();
+				//그 모델을 테이블에 적용
+				rsvInfoPnl.rsvTable.setModel(rsvInfoPnl.rsvTblModel);
+				//좌석과 시간표 초기화				
+				removeSeats();				
 			}		
 		}
 	}
@@ -469,58 +518,62 @@ public class RsvPnl extends JPanel {
 		public void mouseClicked(MouseEvent e) 
 		{
 			JTable tbl = (JTable) e.getSource();
-				
-			if(tbl ==jto)
-			{				
-				//if(e.getButton() == 1 && e.getClickCount() == 2) 
-				//{
-					pSeatsPnl.setSeat(new Vector<String>());
-					System.out.println("일반");
-					int rowIndex = jto.getSelectedRow();					
-					BusColumn buscol = busoModel.getRowData(rowIndex);
-					String busid = buscol.getBUSTIMEID();
-					DbQuery db = new DbQuery();
-					Vector<String> Seats = db.GetUsedSeat(busid);
-					System.out.println(Seats);
-					oSeatsPnl.setSeat(Seats);				
-					JOptionPane.showMessageDialog(null,rowIndex+"-"+buscol.getBUSTIMEID());				
-				//}				
-			}
-			else if(tbl ==jtp)
+			
+			//일반버스시간표 클릭시
+			if(tbl ==tblObusTime)
 			{
-				//if(e.getButton() == 1 && e.getClickCount() == 2) 
-				//{
-					pSeatsPnl.setSeat(new Vector<String>());
-					System.out.println("우등");
-					int rowIndex = jtp.getSelectedRow();					
-					BusColumn buscol = buspModel.getRowData(rowIndex);
-					String busid = buscol.getBUSTIMEID();
-					DbQuery db = new DbQuery();
-					Vector<String> Seats = db.GetUsedSeat(busid);
-					System.out.println(Seats);
-					pSeatsPnl.setSeat(Seats);
-					JOptionPane.showMessageDialog(null,rowIndex+"-"+buscol.getBUSTIMEID());				
-				//}				
+				//좌석초기화
+				oSeatsPnl.setSeat(new Vector<String>());
+				
+				//시간표테이블에서 선택된 행(index)의 값을 얻음 
+				int rowIndex = tblObusTime.getSelectedRow();	
+				//테이블 모델에서 index의 데이터를 얻음
+				BusColumn buscol = busoModel.getRowData(rowIndex);
+				//그 데이터중에서 버스ID를 얻음
+				String busid = buscol.getBUSTIMEID();
+				//그 버스ID에 예약된 좌석을 얻음
+				DbQuery db = new DbQuery();
+				Vector<String> Seats = db.GetUsedSeat(busid);			
+				System.out.println(Seats);
+				//예약된 좌석들을 일반버스좌석에 표시해줌
+				oSeatsPnl.setSeat(Seats);
+				//지울 것!!버스아이디를 알고 싶어서 넣음
+				JOptionPane.showMessageDialog(null,rowIndex+"-"+buscol.getBUSTIMEID());			
+			}
+			//우등버스시간표 클릭시 - 일반 쪽 참고
+			else if(tbl ==tblPbusTime)
+			{
+				pSeatsPnl.setSeat(new Vector<String>());
+				System.out.println("우등");
+				int rowIndex = tblPbusTime.getSelectedRow();					
+				BusColumn buscol = buspModel.getRowData(rowIndex);
+				String busid = buscol.getBUSTIMEID();
+				DbQuery db = new DbQuery();
+				Vector<String> Seats = db.GetUsedSeat(busid);
+				System.out.println(Seats);
+				pSeatsPnl.setSeat(Seats);
+				JOptionPane.showMessageDialog(null,rowIndex+"-"+buscol.getBUSTIMEID());							
 			}
 		}
 	}
 	
-	// 콤보박스에 대한 아이템 리스너
-	
+	// 콤보박스에 대한 아이템 리스너(콤보박스 비활성화로 쓰지 않음)	
 	private class ComboItemListener implements ActionListener 
 	{
 		public void actionPerformed(ActionEvent e)  
 		{
 			JComboBox com = (JComboBox)e.getSource();
 			
+			//콤보박스에서 성인, 소인, 장애인의 선택된 수를 얻음
 			int adult = Integer.parseInt(ComboAdult.getSelectedItem().toString());
 			int child = Integer.parseInt(ComboChild.getSelectedItem().toString());
 			int handy = Integer.parseInt(ComboDisabled.getSelectedItem().toString());
 			
-			if(adult+child+handy >5)
+			if(adult+child+handy >5)//총 인원이 5명이 넘었을 경우
 			{
 				JOptionPane.showMessageDialog(null,"예약은 5명까지 밖에 안됨요. ");
 				
+				//콤보박스의 값들을 그 전값으로 되돌림
 				if(com == ComboAdult)									
 					ComboAdult.setSelectedItem(String.valueOf(cmbAdult));			
 				else if(com == ComboChild)				
@@ -530,14 +583,14 @@ public class RsvPnl extends JPanel {
 			}
 			else
 			{
+				//선택 성공된 콤보박스 값을 저장해 
+				//실패 시 사용할 선택하기 전값으로 활용 
 				cmbAdult = Integer.parseInt(ComboAdult.getSelectedItem().toString());
 				cmbChild = Integer.parseInt(ComboChild.getSelectedItem().toString());
 				cmbHandy = Integer.parseInt(ComboDisabled.getSelectedItem().toString());
 			}
 			
 		}
-		
-
 	}	
 	
-	}
+}

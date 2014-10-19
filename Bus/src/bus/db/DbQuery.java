@@ -359,7 +359,7 @@ public class DbQuery
 		}
 		catch(SQLException e)
 		{
-			JOptionPane.showMessageDialog(null,"인서트 에러"+e.getErrorCode());
+			JOptionPane.showMessageDialog(null,"인서트 에러"+e.getErrorCode()+e.getMessage());
 		}
 		finally
 		{
@@ -434,6 +434,40 @@ public class DbQuery
 		}
 		return rsvList;
 	}
+	
+	
+	public Vector<String> getPkgName() 
+	{
+		String selectPkgId = "SELECT packagename FROM TVPKGTBL order by bustimeid";
+		Vector<String> pname = new Vector<String>(); 
+		String pkgid="";
+		try 
+		{
+			conn = BusDbConnect.getConnect();
+			pstmt = conn.prepareStatement(selectPkgId);			
+			
+			result = pstmt.executeQuery();				
+			
+			while(result.next()) 
+			{				
+				pname.add(result.getString("packagename"));			
+			}
+		
+		} catch(SQLException e) {
+			e.printStackTrace();
+			
+		} finally {
+			
+			try {
+				
+				if(result != null) result.close();
+				if(pstmt != null) result.close();
+				if(conn != null) conn.close();
+				
+			} catch(SQLException e) {}
+		}		
+		return pname;
+	}	
 	
 	public Vector<String> GetUsedSeat(String busid)
 	{

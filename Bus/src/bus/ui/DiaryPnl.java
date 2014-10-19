@@ -1,5 +1,6 @@
 package bus.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -16,8 +17,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
-
-import bus.db.DbQuery;
 
 public class DiaryPnl extends JPanel{
 	
@@ -49,18 +48,22 @@ public class DiaryPnl extends JPanel{
 	Calendar curMon = Calendar.getInstance();
  
 	public DiaryPnl(){
+		this.mainFrame = mainFrame;
+		
+		this.setLayout(new BorderLayout());
+		this.setPreferredSize(new Dimension(620,410));
+		this.setMaximumSize(new Dimension(620,410));
+		this.setMaximumSize(new Dimension(620,410));
 		
 		box.setPreferredSize(new Dimension(580,380));
 		
-		this.mainFrame = mainFrame;
 		
 		pUp.setLayout(new FlowLayout(FlowLayout.RIGHT));		
 		pUp2.setLayout(new FlowLayout(FlowLayout.RIGHT));
-
 		
 		pUp.add(btnPrevMon);
 		pUp.add(lblYearMon);
-		pUp.add(btnNextMon);
+		pUp.add(btnNextMon);	
 		
 		pUp2.add(btnDiarySave);
 		
@@ -71,38 +74,37 @@ public class DiaryPnl extends JPanel{
 		pUp3.add(pUp4);
 		pUp3.add(pUp2);
 		
+		pUp3.setPreferredSize(new Dimension(580, 40));
+		pUp3.setMaximumSize(new Dimension(580, 40));
+		pUp3.setMinimumSize(new Dimension(580, 40));
 		box.add(pUp3);
 		box.add(Box.createVerticalGlue());
-		box.add(Box.createHorizontalGlue());
 		
 		pWeek.setLayout(new GridLayout(1, 7));
 		for (int i = 0; i < Week.length; i++) {
 			pWeek.add(lbladdWeek(Week[i], Color.LIGHT_GRAY));
-		}
-		box.add(pWeek);
-		box.add(Box.createVerticalGlue());
-				
+		}		
+
 		pDate.setLayout(new GridLayout(6, 7));
 		for (int i = 0; i < btnArr.length; i++) {
 			btnArr[i] = new JButton("");
 			pDate.add(btnArr[i]);
-		}
-		box.add(pDate);
-		
+		}		
 		btnPrevMon.addActionListener(new BtnEventHandler());
-		btnNextMon.addActionListener(new BtnEventHandler());
-		
+		btnNextMon.addActionListener(new BtnEventHandler());	
 		btnDiarySave.addActionListener(new BtnEventHandler());
-		setDays(curMon);
+		setDays(curMon);	
 		
-		
-		box.add(Box.createVerticalGlue());
 		JTextArea areaMemo = new JTextArea(7,20);
 		areaMemo.setBackground(new Color(255,255,255));			
 		JScrollPane scrollPane = new JScrollPane(areaMemo,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		
+				
+		box.add(pWeek);
+		box.add(Box.createVerticalGlue());
+		box.add(pDate);
+		box.add(Box.createVerticalGlue());
 		box.add(scrollPane);
 		add(box);	
 	}

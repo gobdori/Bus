@@ -31,7 +31,7 @@ public class CalendarInfo extends JDialog {
 	protected PreparedStatement pstmt = null;
 	protected ResultSet result;
 	
-	RsvPnl mainFrame;
+	RsvPnl rsvpn;
 	
 	JPanel pDate = new JPanel();
 	JPanel pWeek = new JPanel();
@@ -52,12 +52,13 @@ public class CalendarInfo extends JDialog {
 	
 	
 	public CalendarInfo(RsvPnl mainFrame, boolean modal) 
-	{
+	{		
 		this.setModal(modal);
-		this.mainFrame = mainFrame;
-		des = this.mainFrame.ComboDepartO.getSelectedItem().toString();
+		rsvpn = mainFrame;
+		
+		des = rsvpn.ComboDepartO.getSelectedItem().toString();
 		System.out.println("출발지"+des);
-		arr = this.mainFrame.ComboArrivalO.getSelectedItem().toString();
+		arr = rsvpn.ComboArrivalO.getSelectedItem().toString();
 		System.out.println("도착지"+arr);
 				
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -141,10 +142,10 @@ public class CalendarInfo extends JDialog {
 	public void setDialogLocation() {
 		
 		// 메인 프레임의 위치를 이용해 프레임을 띄우 x, y 위치를 구한다.
-		int x = mainFrame.getX() 
-				+ mainFrame.getWidth() / 2 - this.getWidth() / 2;
-		int y = mainFrame.getY() 
-				+ mainFrame.getHeight() / 2 - this.getHeight() / 2;		
+		int x = rsvpn.getX() 
+				+ rsvpn.getWidth() / 2 - this.getWidth() / 2;
+		int y = rsvpn.getY() 
+				+ rsvpn.getHeight() / 2 - this.getHeight() / 2;		
 		
 		// 메인 프레임의 중앙에 가는 일정 선택 프레임을 띄운다.		
 		setLocation(x, y);		
@@ -186,21 +187,21 @@ public class CalendarInfo extends JDialog {
 			String arrid = qry.getTmnId(arr);
 			System.out.println("도착지id" +arrid);
 			//qry.DbBusInfo(date, des, arr);
-						
-			mainFrame.vCBus =qry.getBusList(desid, arrid, date);
+			rsvpn.removeSeats();
+			rsvpn.vCBus =qry.getBusList(desid, arrid, date);
 			
 			BusTimesTableModel busoModel;	  
 			BusTimesTableModel buspModel;
 			
 			busoModel = new BusTimesTableModel(qry.getObustime());	   
 			buspModel = new BusTimesTableModel(qry.getPbustime());
-			mainFrame.busoModel = busoModel;
-			mainFrame.jto.setModel(busoModel);
-			mainFrame.buspModel = buspModel;
-			mainFrame.jtp.setModel(buspModel);
+			rsvpn.busoModel = busoModel;
+			rsvpn.tblObusTime.setModel(busoModel);
+			rsvpn.buspModel = buspModel;
+			rsvpn.tblPbusTime.setModel(buspModel);
 			
-			mainFrame.jto.revalidate();
-			mainFrame.jtp.revalidate();			
+			rsvpn.tblObusTime.revalidate();
+			rsvpn.tblPbusTime.revalidate();			
 			setVisible(false);
 		}
 	}

@@ -1,9 +1,11 @@
 package bus.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -14,8 +16,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
-import bus.db.BusDbConnect;
 import bus.db.DbQuery;
 
 public class LoginFrm extends JFrame 
@@ -41,6 +43,11 @@ public class LoginFrm extends JFrame
 		//Login 프레임의 레이아웃 = FlowLayout
 		this.setLayout(new FlowLayout());
 		
+		//화면의 중간에서 실행되게 하는 구문
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		this.setLocation((screenSize.width-500)/2, (screenSize.height-440)/2);
+
+		
 		//텍스트박스랑 버튼이 들어갈 lg패널 생성
 		JPanel lgPnl = new JPanel();
 		
@@ -57,8 +64,8 @@ public class LoginFrm extends JFrame
 		JPanel bg = new BgPanel();
 		
 		//화면에 꽉 채워야 하므로 보더레이아웃 설정.
-		bg.setLayout(new BorderLayout());
-				
+		bg.setLayout(new BorderLayout());		
+		
 		//bg패널에 lg 패널을 추가하여 텍스트박스랑 버튼이 보이도록함 
 		bg.add(lgPnl, BorderLayout.CENTER );
 		
@@ -70,10 +77,12 @@ public class LoginFrm extends JFrame
 		btnLogin.addActionListener(loginListener);
 		txtPassword.addActionListener(loginListener);
 		
-		this.setContentPane(bg);		
-		this.setSize(500,460);
-		setVisible(true);
 		
+		this.setContentPane(bg);		
+		this.setSize(500,440);	
+		
+		setUndecorated(true);
+		setVisible(true);
     	//this.pack();	
 	}
 

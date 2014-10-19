@@ -27,6 +27,9 @@ public class RsvInfoPnl extends JPanel {
 	RsvInfoPnl rsinfopnl;
 	
 	RsvInfoPnl(){
+		this.setPreferredSize(new Dimension(620,410));
+		this.setMaximumSize(new Dimension(620,410));
+		this.setMaximumSize(new Dimension(620,410));
 		
 		rsinfopnl=this;
 		/* 메인프레임 north */

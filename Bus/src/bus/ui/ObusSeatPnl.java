@@ -23,27 +23,21 @@ public class ObusSeatPnl extends JPanel
 			"G1","G2","G3","G4","H1","H2","H3","H4","I1","I2","I3","I4"};
 	JButton button[]=new JButton[36];
 	
-	
+	//선택된 좌석에 색깔을 주고 비활성화 시킴
 	public void setSeat(Vector<String> seats)
 	{	
-		for(int i = 0; i<arrSeats.length;i++)
+		for(int i = 0; i<button.length;i++)
 		{
-			if(seats.contains(arrSeats[i].toString()))
-			{
-				for(int j = 0; j<button.length;j++)
+			button[i].setBackground(Color.lightGray);
+			button[i].setEnabled(true);
+			for(int j=0;j<seats.size();j++)
+			{			
+				if(button[i].getText().equals(seats.get(j).toString()))
 				{
-					if(button[i].getText()==arrSeats[i].toString())
-					{
-						button[i].setBackground(Color.orange);
-						button[i].setEnabled(false);
-					}
-					else
-					{
-						button[i].setBackground(Color.lightGray);
-						button[i].setEnabled(true);
-					}
+					button[i].setBackground(Color.orange);					
+					button[i].setEnabled(false);					
 				}								
-			}
+			}			
 		}		
 	}
 	
@@ -142,10 +136,10 @@ public class ObusSeatPnl extends JPanel
 		@Override
 		public void mouseClicked(MouseEvent e) 
 		{
-			JButton b=(JButton)e.getSource();
+			JButton btn=(JButton)e.getSource();
 			
 			//버튼 색깔이 lightGray일 경우에 
-			if(b.getBackground()==Color.lightGray)
+			if(btn.getBackground()==Color.lightGray)
 			{
 				//선택된 좌석이 5자리 이상일 경우. 
 				if(seats.size()>=5)
@@ -157,39 +151,40 @@ public class ObusSeatPnl extends JPanel
 				{
 					if(e.getButton()==1 && e.getClickCount() == 1)
 					{
-						b.setBackground(Color.RED);
-						seats.add(new String(b.getText()));
-						adseats.add(new String(b.getText()));
+						btn.setBackground(Color.RED);
+						seats.add(new String(btn.getText()));
+						adseats.add(new String(btn.getText()));
 						sd.seats = seats;
 						sd.adultSeats = adseats;
 					}
 					else if(e.getButton() == 3)
 					{
-						b.setBackground(Color.YELLOW);
-						seats.add(new String(b.getText()));
-						hdseats.add(new String(b.getText()));
+						btn.setBackground(Color.YELLOW);
+						seats.add(new String(btn.getText()));
+						hdseats.add(new String(btn.getText()));
 						sd.seats = seats;
 						sd.handySeats = hdseats;						
 					}					
 				}
 			}
-			else if(b.getBackground()==Color.RED)
+			else if(btn.getBackground()==Color.RED)
 			{
-				b.setBackground(Color.PINK);
-				chseats.add(new String(b.getText()));
+				btn.setBackground(Color.PINK);
+				chseats.add(new String(btn.getText()));
 				sd.childSeats = chseats;
 				
-				adseats.remove(new String(b.getText()));
+				adseats.remove(new String(btn.getText()));
 				sd.adultSeats = adseats;
 			}
+			else if(btn.getBackground()==Color.ORANGE){}
 			else
 			{
 				//버튼 색깔이 레드일 경우엔(클릭해제)
 				//벡터에 저장된 값에서 text값을 없애줌
-				seats.remove(new String(b.getText()));
-				adseats.remove(new String(b.getText()));
-				chseats.remove(new String(b.getText()));
-				hdseats.remove(new String(b.getText()));
+				seats.remove(new String(btn.getText()));
+				adseats.remove(new String(btn.getText()));
+				chseats.remove(new String(btn.getText()));
+				hdseats.remove(new String(btn.getText()));
 				
 				sd.seats = seats;
 				sd.adultSeats = adseats;
@@ -197,7 +192,7 @@ public class ObusSeatPnl extends JPanel
 				sd.handySeats = hdseats;
 				
 				//원래의 색깔인 lightGray로 변경함.
-				b.setBackground(Color.lightGray);
+				btn.setBackground(Color.lightGray);
 			}
 			
 			sd.ComboAdult.setSelectedItem(String.valueOf(adseats.size()));
